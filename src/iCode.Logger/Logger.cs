@@ -162,14 +162,12 @@ namespace iCode.Log
             }
         }
 
-        // Method to set a new logger after disposing the old ones
-        public static void SetLogger(ILoggerTarget logger)
-        {
-            if (logger == null)
-            {
-                throw new ArgumentNullException("logger");
-            }
 
+
+        // Method to clear loggerTarget list after disposing the old ones
+        public static void ResetLoggers(ILoggerTarget? logger = null)
+        {
+        
             foreach (ILoggerTarget log in loggerTargets)
             {
                 if (log is IDisposable)
@@ -177,8 +175,12 @@ namespace iCode.Log
                     ((IDisposable)log).Dispose();
                 }
             }
+
             loggerTargets.Clear();
-            loggerTargets.Add(logger);
+            if(logger != null)
+            {
+                loggerTargets.Add(logger);
+            }
         }
 
         // Method to add a logger to the existing list
@@ -209,8 +211,22 @@ namespace iCode.Log
             loggerTargets.Remove(logger);
         }
 
-        // Method to add a file logger
-        public static ILoggerTarget? AddFileLogger(String fullPath)
+        public static ILoggerTarget? CreateKafkaEventHubLogger(string eventHubNamespace, string connectionString, string topic = "iLogger")
+        {
+            return  new EventHubKafkaLogger(eventHubNamespace, connectionString, topic);
+        }
+        public static ILoggerTarget? AddKafkaEventHubLogger(string eventHubNamespace, string connectionString, string topic = "iLogger")
+        {
+            var  newLogger = CreateKafkaEventHubLogger(eventHubNamespace, connectionString, topic);
+
+            if(newLogger != null)
+                AddLogger(newLogger);
+
+            return newLogger;
+        }
+
+        // Method to get a file logger
+        public static ILoggerTarget? CreateFileLogger(String fullPath)
         {
             StreamWriter? writer = FilePath.CreatePathAndFile(fullPath);
 
@@ -218,7 +234,6 @@ namespace iCode.Log
             {
                 writer.AutoFlush = true;
                 var logger = new WriteLineLogger<StreamWriter>(writer);
-                AddLogger(logger);
                 return logger;
             }
             else
@@ -227,21 +242,28 @@ namespace iCode.Log
             }
         }
 
-        // Method to get a file logger
-        public static ILoggerTarget? GetFileLogger(String fullPath)
+        // Method to add a file logger
+        public static ILoggerTarget? AddFileLogger(String fullPath)
         {
-            StreamWriter? writer = FilePath.CreatePathAndFile(fullPath);
+            var newLogger = CreateFileLogger(fullPath);
 
-            if (writer != null)
+            if (newLogger != null)
+                AddLogger(newLogger);
+
+            return newLogger;
+        }
+
+        public static ILoggerTarget? AddColoredConsoleWriter()
+        {
+            foreach(var logger in loggerTargets)
             {
-                writer.AutoFlush = true;
-                var logger = new WriteLineLogger<StreamWriter>(writer);
-                return logger;
+                if (logger is ColoredConsoleWriter)
+                    return logger;
             }
-            else
-            {
-                return null;
-            }
+            var newlogger = new ColoredConsoleWriter();
+            AddLogger(newlogger);
+            return newlogger;
+
         }
     }
 }

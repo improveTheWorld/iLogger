@@ -10,4 +10,8 @@
     <Compile Remove="Program.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Confluent.Kafka" Version="2.2.0" />
+  </ItemGroup>
+
 </Project>
