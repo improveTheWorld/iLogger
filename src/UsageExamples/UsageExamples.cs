@@ -1,13 +1,7 @@
 ﻿using iCode.Log;
 using iLoggerUsageExamples.loggabaleObjects;
 using iLoggerUsageExamples.nameSapceTargetedObjects;
-using System;
-using System.Linq;
-
-
-
-
-
+using Microsoft.Extensions.Configuration;
 
 namespace iLoggerUsageExamples
 {
@@ -90,10 +84,12 @@ namespace iLoggerUsageExamples
         }
     }
 
-    internal class UsageExamples
+    internal class UsageExamplesProgram
     {
         static void Main(string[] args)
         {
+ 
+
             Config loggerConfiguration = iLogger.Filters;
 
             loggerConfiguration.IncludeTimestamp = true;
@@ -101,17 +97,59 @@ namespace iLoggerUsageExamples
             loggerConfiguration.IncludeTaskId = true;
             loggerConfiguration.IncludeThreadId = true;
 
+            LogIntoKafkEvent();
 
             DisplayVariableChangeTracking();
             DisplayInstancesTargettingExamples();
             DisplayNamespacesTargettingExamples();
+
             
+        }
+        static void LogIntoKafkEvent()
+        {
+
+            
+            Config loggerConfiguration = iLogger.Filters;
+            loggerConfiguration.ResetFilters();
+            iLogger.WriteLine("** LogIntoKafkEvent usage example,please create your azure hub event with kafka enabled ", LogLevel.Warn);
+            iLogger.WriteLine("           Start kafka server and then Enter event hub namespace...", LogLevel.Warn);
+            string? eventHubNamespace = Console.ReadLine();
+            iLogger.WriteLine("           enter kafka topic / event hub name ...", LogLevel.Warn);
+            string? topic = Console.ReadLine();
+            iLogger.WriteLine("           enter connexion string ...", LogLevel.Warn);
+            string? connexionstring = Console.ReadLine();
+            iLogger.WriteLine("           enter log to put into kafka ...", LogLevel.Warn);
+            string? log = Console.ReadLine();
 
 
+            var builder = new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 
+            var settings = builder.Build();
+
+            // default values
+            if (String.IsNullOrEmpty(eventHubNamespace))
+                eventHubNamespace = settings["kafka_eventHubNamespace"];
+            if (string.IsNullOrEmpty(connexionstring))
+                connexionstring = settings["kafka_connexionstring"];
+            if (string.IsNullOrEmpty(topic))
+                topic = settings["kafka_topic"];
+
+
+            if (String.IsNullOrEmpty(log))
+                log = "**Hello world !! Log Into Kafk Event Test ";
+
+            iLogger.ResetLoggers();
+            iLogger.AddKafkaEventHubLogger(eventHubNamespace, connexionstring, topic);
+
+            iLogger.WriteLine(log); // here is the loggin operation to kafka
+
+            iLogger.AddColoredConsoleWriter();
+            iLogger.AddFileLogger(settings["fileLogger_Path"]);
+            Console.WriteLine("Press any key to continue...", LogLevel.Warn);
+            Console.ReadKey();
+            Console.Clear();
 
         }
-
         static void DisplayVariableChangeTracking()
         {
             Config loggerConfiguration = iLogger.Filters;
