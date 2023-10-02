@@ -15,6 +15,7 @@ namespace iCode.Log
         // DebugLogger flag to control debug logging, default is false
         public static bool DebugLogger { get; set; } = false;
 
+        public static LogLevel MaxAuthorizedLogLevel= LogLevel.Fatal;
 
         // Flag to indicate whether buffering is enabled
         static bool bufferEnabled;
@@ -93,6 +94,9 @@ namespace iCode.Log
         // Log method to log the object with a specific LogLevel
         public static void Log(object objectToLog, LogLevel logLevel = LogLevel.Trace, object? requester = null)
         {
+            if (logLevel > MaxAuthorizedLogLevel)
+                return;
+
             // ensure thread safety
             lock (loggerTargets)
             {
