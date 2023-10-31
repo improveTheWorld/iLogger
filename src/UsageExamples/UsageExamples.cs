@@ -184,7 +184,7 @@ namespace iLoggerUsageExamples
             iLogger.WriteLine("** Target a specific namespace for logging.", LogLevel.Warn);
 
 
-            loggerConfiguration.WatchedNameSpaces.Watch(new NameSpace("iLoggerUsageExamples.nameSapceTargetedObjects"));      
+            loggerConfiguration.WatchedNameSpaces.Watch(new NameSpaceComparer("iLoggerUsageExamples.nameSapceTargetedObjects"));      
             firstNumericObject.WatchByLogger("NumericLoggableObject");
             firstNumericObject.UpdateAndLogValue(5);
             firstStringObject.WatchByLogger("StringLoggableObject");

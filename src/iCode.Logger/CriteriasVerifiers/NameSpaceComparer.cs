@@ -1,16 +1,16 @@
 ﻿namespace iCode.Log
 {
-    public class NameSpace
+    public class NameSpaceComparer
     {
         string[] namespaces;
         public bool includeSubSpaces = false;
 
 
-        public NameSpace ParentNameSpace(int level)
+        public NameSpaceComparer ParentNameSpace(int level)
         {
-            return new NameSpace(this,level);
+            return new NameSpaceComparer(this,level);
         }
-        NameSpace(NameSpace inputNameSpace, int ignore)
+        NameSpaceComparer(NameSpaceComparer inputNameSpace, int ignore)
         {
 
             if (0 <= ignore && ignore < inputNameSpace.namespaces.Length)
@@ -22,7 +22,7 @@
                 throw new ArgumentOutOfRangeException($"Second argument = {ignore}, should be between 0 and {inputNameSpace.namespaces.Length-1}");
             }
         }
-        public NameSpace(string nameSpace)
+        public NameSpaceComparer(string nameSpace)
         {
 
             namespaces = nameSpace.Split('.')
@@ -62,12 +62,12 @@
             }
         }
 
-        public bool isMatching(NameSpace input)
+        public bool isMatching(NameSpaceComparer input)
         {
             
             if(input.namespaces.Length > namespaces.Length  && includeSubSpaces)
             {
-                return isMatching(new NameSpace(input, input.namespaces.Length - namespaces.Length)) ;
+                return isMatching(new NameSpaceComparer(input, input.namespaces.Length - namespaces.Length)) ;
             }
             else if (namespaces.Length != input.namespaces.Length)
             {

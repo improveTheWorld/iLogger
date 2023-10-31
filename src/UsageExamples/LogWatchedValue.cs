@@ -1,7 +1,8 @@
 ﻿
 using iCode.Tools.WatchedValue;
+using iCode.Log;
 
-namespace iCode.Log
+namespace iLoggerUsageExamples
 {
     public class Loggable<T> : WatchedValueWrapper<T>
     {

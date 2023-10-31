@@ -1,8 +1,8 @@
 ﻿namespace iCode.Log
 {
-    public class NameSpaceListWatcher : ListWatcher<NameSpace>
+    public class NameSpaceListWatcher : ListWatcher<NameSpaceComparer>
     {
-        override public bool isWatched(NameSpace nameSpaceToCheck)
+        override public bool isWatched(NameSpaceComparer nameSpaceToCheck)
         {
             if (watchedList == null)
             {
@@ -10,7 +10,7 @@
             } 
             else
             {
-                foreach (NameSpace nameSpace in watchedList)
+                foreach (NameSpaceComparer nameSpace in watchedList)
                 {
                     if (nameSpace.isMatching(nameSpaceToCheck))
                         return true;
@@ -21,7 +21,7 @@
 
         public bool isWatchedObject(object instance)
         {
-            return isWatched(new NameSpace(instance.GetType().ToString()).ParentNameSpace(1));
+            return isWatched(new NameSpaceComparer(instance.GetType().ToString()).ParentNameSpace(1));
         }
 
     }
